@@ -1,9 +1,28 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
+import { type Product } from '../../data/products';
 
-const favoritesSlice = createSlice({
+interface FavoritesState {
+  items: Product[];
+}
+
+const initialState: FavoritesState = {
+  items: [],
+};
+
+export const favoritesSlice = createSlice({
   name: 'favorites',
-  initialState: {},
-  reducers: {},
-})
+  initialState,
+  reducers: {
+    toggleFavorite: (state, action: PayloadAction<Product>) => {
+      const index = state.items.findIndex(item => item.id === action.payload.id);
+      if (index >= 0) {
+        state.items.splice(index, 1);
+      } else {
+        state.items.push(action.payload);
+      }
+    },
+  },
+});
 
-export default favoritesSlice.reducer
+export const { toggleFavorite } = favoritesSlice.actions;
+export default favoritesSlice.reducer;

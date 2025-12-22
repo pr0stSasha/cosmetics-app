@@ -1,0 +1,67 @@
+.form {
+  width: 100%;
+}
+
+.stepTitle {
+  font-size: 0.9rem;
+  color: #e8a0bf;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 20px;
+}
+
+.section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 25px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.btn {
+  padding: 20px;
+  border: 1px solid #eee;
+  background: white;
+  border-radius: 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  border-color: #e8a0bf;
+  background: #fff5f8;
+}
+
+.active {
+  padding: 20px;
+  border: 2px solid #e8a0bf;
+  background: #fff5f8;
+  color: #e8a0bf;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.back {
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.submit {
+  width: 100%;
+  margin-top: 30px;
+  padding: 15px;
+  background: #333;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+}

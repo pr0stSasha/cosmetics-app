@@ -1,27 +1,26 @@
-import { createSlice } from '@reduxjs/toolkit';
-import type { PayloadAction } from '@reduxjs/toolkit';
-import type { SurveyAnswers } from '../../types';
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
 interface SurveyState {
-  answers: SurveyAnswers;
+  skinType: string;
+  colorType: string;
 }
 
+// По умолчанию ставим "Все", чтобы в начале показывались все товары
 const initialState: SurveyState = {
-  answers: {},
+  skinType: 'Все',
+  colorType: 'Все',
 };
 
-const surveySlice = createSlice({
+export const surveySlice = createSlice({
   name: 'survey',
   initialState,
   reducers: {
-    setAnswer(state, action: PayloadAction<{ question: string; value: boolean }>) {
-      state.answers[action.payload.question] = action.payload.value;
-    },
-    resetSurvey(state) {
-      state.answers = {};
+    // Этот экшен мы будем вызывать при клике в профиле
+    setPreference: (state, action: PayloadAction<{field: keyof SurveyState, value: string}>) => {
+      state[action.payload.field] = action.payload.value;
     },
   },
 });
 
-export const { setAnswer, resetSurvey } = surveySlice.actions;
+export const { setPreference } = surveySlice.actions;
 export default surveySlice.reducer;

@@ -1,8 +1,15 @@
-import React from 'react';
-import AppRouter from './router/AppRouter';
+import AppRouter from "./router/AppRouter"; 
+import { BrowserRouter } from 'react-router-dom';
+import { Layout } from './components/Layout';
 
-const App: React.FC = () => {
-  return <AppRouter />;
-};
+function App() {
+  return (
+    <BrowserRouter>
+      <Layout>
+        <AppRouter />
+      </Layout>
+    </BrowserRouter>
+  );
+}
 
 export default App;
