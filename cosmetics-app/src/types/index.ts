@@ -1,8 +1,15 @@
-export interface User {
+export interface AppUser {
   id: string;
-  email?: string;
-  username?: string;
-  isAdmin: boolean; 
+  username: string;
+  isAdmin: boolean;
+  skin_type?: string;
+  age?: number;
+  full_name?: string;
+  care_type?: string[];
+  preference_type?: string;
+  color_type?: string;
+  skin_problem?: string[];
+  budget_segment?: string;
 }
 
 export interface Product {
