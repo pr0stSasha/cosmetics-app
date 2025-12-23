@@ -1,84 +1,42 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import type { RootState } from '../../app/store';
-import { logout } from '../../features/auth/authSlice';
-import type { AppUser } from '../../types/index';
 
 const Header: React.FC = () => {
-  const user = useSelector((state: RootState) => state.auth.user) as AppUser | null;
-  const dispatch = useDispatch();
+  const { user } = useSelector((state: RootState) => state.auth);
 
   return (
-    <header style={headerStyle}>
-      <Link to="/" style={logoStyle}>MAIMEI 🌸</Link>
-      
-      <nav style={navStyle}>
-        {/* Общие ссылки для всех */}
-        <Link to="/" style={linkStyle}>Рекомендации</Link>
-        <Link to="/favorites" style={linkStyle}>Избранное</Link>
-
-        {user ? (
-          <>
-            {/* Ссылка только для админа */}
-            {user.isAdmin && (
-              <Link to="/admin" style={{ ...linkStyle, color: '#db7093', fontWeight: 'bold' }}>
-                Админ
-              </Link>
-            )}
-            <Link to="/profile" style={linkStyle}>
-              Профиль ({user.username})
-            </Link>
-            <button onClick={() => dispatch(logout())} style={logoutStyle}>
-              Выход
-            </button>
-          </>
-        ) : (
-          <Link to="/auth" style={linkStyle}>Войти</Link>
+    <nav style={navStyle}>
+      <div style={logoStyle}>
+        <Link to="/" style={{ textDecoration: 'none', color: '#db7093' }}>MAIMEI ✨</Link>
+      </div>
+      <div style={linksStyle}>
+        <Link to="/" style={linkItem}>Рекомендации</Link>
+        <Link to="/favorites" style={linkItem}>Избранное</Link>
+        <Link to="/profile" style={linkItem}>Профиль</Link>
+        {user?.isAdmin && (
+          <Link to="/admin" style={{ ...linkItem, color: '#db7093', fontWeight: 'bold' }}>Админ</Link>
         )}
-      </nav>
-    </header>
+      </div>
+    </nav>
   );
 };
 
-// Стили для опрятного вида
-const headerStyle: React.CSSProperties = { 
-  padding: '15px 40px', 
-  display: 'flex', 
-  justifyContent: 'space-between', 
-  alignItems: 'center', 
-  backgroundColor: '#fff', 
-  boxShadow: '0 2px 10px rgba(0,0,0,0.05)' 
+const navStyle: React.CSSProperties = {
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  padding: '15px 30px',
+  background: '#fff',
+  borderBottom: '1px solid #fdf2f6',
+  position: 'sticky',
+  top: 0,
+  zIndex: 1000
 };
 
-const logoStyle: React.CSSProperties = { 
-  fontSize: '22px', 
-  fontWeight: 'bold', 
-  color: '#db7093', 
-  textDecoration: 'none' 
-};
-
-const navStyle: React.CSSProperties = { 
-  display: 'flex', 
-  gap: '25px', 
-  alignItems: 'center' 
-};
-
-const linkStyle: React.CSSProperties = { 
-  textDecoration: 'none', 
-  color: '#555', 
-  fontSize: '15px',
-  fontWeight: 500 
-};
-
-const logoutStyle: React.CSSProperties = { 
-  background: 'none', 
-  border: '1px solid #db7093', 
-  color: '#db7093', 
-  padding: '5px 12px', 
-  borderRadius: '8px', 
-  cursor: 'pointer',
-  fontSize: '14px'
-};
+const logoStyle = { fontSize: '24px', fontWeight: 'bold' };
+const linksStyle = { display: 'flex', gap: '20px' };
+const linkItem = { textDecoration: 'none', color: '#555', fontSize: '16px' };
 
 export default Header;

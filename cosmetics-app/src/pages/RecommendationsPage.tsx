@@ -1,225 +1,120 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { supabase } from '../supabaseClient';
+import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 import type { RootState } from '../app/store';
 import type { Product } from '../types';
 
 const RecommendationsPage: React.FC = () => {
   const user = useSelector((state: RootState) => state.auth.user);
-  const navigate = useNavigate();
-  const [products, setProducts] = useState<Product[]>([]);
+  const [recommendations, setRecommendations] = useState<Product[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchRecommendations = useCallback(async () => {
-    if (!user) return;
-    setLoading(true);
+  useEffect(() => {
+    const loadAllData = async () => {
+      if (!user) return;
+      setLoading(true);
+      try {
+        const { data: userData } = await supabase
+          .from('users_custom')
+          .select('skin_type, budget_segment')
+          .eq('id', user.id)
+          .single();
 
-    try {
-      const { data: profile } = await supabase.from('users_custom').select('*').eq('id', user.id).single();
-      const { data: favData } = await supabase.from('favorites').select('product_id').eq('user_id', user.id);
-      const favoriteIds = favData?.map(fav => fav.product_id) || [];
+        if (userData) {
+          // Загружаем товары
+          const { data: products } = await supabase
+            .from('products')
+            .select('*')
+            .eq('budget_segment', userData.budget_segment)
+            .or(`category_type.eq.makeup, skin_type.cs.{${userData.skin_type}}`);
 
-      const skinMap: Record<string, string> = { 
-        "Жирная 🌼": "oily", 
-        "Сухая": "dry", 
-        "Комбинированная": "combination", 
-        "Нормальная": "normal" 
-      };
-      
-      const budgetMap: Record<string, string> = { 
-        "Бюджетно": "budget", 
-        "Масс-маркет": "medium", 
-        "Люкс": "luxury" 
-      };
+          if (products) setRecommendations(products);
 
-      let query = supabase.from('products').select('*');
-
-      if (profile) {
-        const skinKey = skinMap[profile.skin_type] || profile.skin_type;
-        const budgetKey = budgetMap[profile.budget_segment] || profile.budget_segment;
-        const typeKey = profile.preference_type; 
-
-        if (skinKey && skinKey !== 'all') query = query.filter('skin_type', 'cs', `{"${skinKey}"}`);
-        if (budgetKey && budgetKey !== 'all' && budgetKey !== 'Любая') query = query.eq('budget_segment', budgetKey);
-        if (typeKey && typeKey !== 'any' && typeKey !== 'both' && typeKey !== 'Любая') query = query.eq('category_type', typeKey);
+          // Загружаем ID избранного
+          const { data: favs } = await supabase
+            .from('favorites')
+            .select('product_id')
+            .eq('user_id', user.id);
+          
+          if (favs) {
+            setFavoriteIds(favs.map(f => f.product_id));
+          }
+        }
+      } catch (error) {
+        console.error("Ошибка:", error);
+      } finally {
+        setLoading(false);
       }
-
-      if (favoriteIds.length > 0) query = query.not('id', 'in', `(${favoriteIds.join(',')})`);
-
-      const { data: finalProducts, error } = await query;
-      if (error) throw error;
-      setProducts(finalProducts || []);
-    } catch (err) {
-      console.error('Ошибка:', err);
-    } finally {
-      setLoading(false);
-    }
+    };
+    loadAllData();
   }, [user]);
-
-  useEffect(() => { fetchRecommendations(); }, [fetchRecommendations]);
 
   const toggleFavorite = async (productId: string) => {
     if (!user) return;
-    const { error } = await supabase.from('favorites').insert([{ user_id: user.id, product_id: productId }]);
-    if (!error) setProducts(prev => prev.filter(p => p.id !== productId));
+    
+    // Добавляем в базу
+    await supabase.from('favorites').insert([{ user_id: user.id, product_id: productId }]);
+    
+    // Обновляем локальный стейт ID, чтобы товар исчез из списка (фильтрация ниже)
+    setFavoriteIds(prev => [...prev, productId]);
   };
 
-  if (loading) return <div style={centerText}>✨ Подбираем секреты красоты для тебя...</div>;
+  // ФИЛЬТРАЦИЯ: Показываем только те товары, которые НЕ в избранном
+  const filteredRecommendations = recommendations.filter(
+    (product) => !favoriteIds.includes(product.id)
+  );
+
+  if (loading) return <div style={centerStyle}>✨ Ищем новинки для тебя...</div>;
+
+  if (filteredRecommendations.length === 0) {
+    return (
+      <div style={emptyContainerStyle}>
+        <h2 style={{ color: '#db7093' }}>Ты лайкнула всё! ✨</h2>
+        <p style={{ color: '#888' }}>Все подходящие товары уже в твоём избранном.</p>
+        <Link to="/favorites" style={linkButtonStyle}>Перейти в Избранное</Link>
+      </div>
+    );
+  }
 
   return (
     <div style={pageContainer}>
-      <div style={heroSection}>
-        <h1 style={heroTitle}>Welcome to maimei</h1>
-        <p style={heroSubtitle}>Персональный подбор на основе твоих предпочтений</p>
-      </div>
-
-      {products.length === 0 ? (
-        <div style={centerText}>
-          <p style={{ fontSize: '18px', color: '#999' }}>Ничего не нашлось. Попробуй изменить параметры!</p>
-          <button onClick={() => navigate('/profile')} style={outlineBtn}>Обновить анкету</button>
-        </div>
-      ) : (
-        <div style={gridStyle}>
-          {products.map(product => (
-            <div key={product.id} style={cardStyle}>
-              {/* Добавили бейдж категории, который был в стилях, но не в верстке */}
-              <div style={badgeStyle}>
-                {product.category_type === 'care' ? 'Care' : 'Makeup'}
-              </div>
-              
-              <img src={product.image_url} alt={product.name} style={imgStyle} />
-              
-              <div style={contentStyle}>
-                <h4 style={productNameStyle}>{product.name}</h4>
-                <p style={productPrice}>{product.price} ₽</p>
-                <button onClick={() => toggleFavorite(product.id)} style={favBtn}>
-                  Добавить в бокс ❤️
-                </button>
-              </div>
+      <h2 style={{ color: '#db7093', marginBottom: '30px' }}>Рекомендации ✨</h2>
+      <div style={gridStyle}>
+        {filteredRecommendations.map((product) => (
+          <div key={product.id} style={cardStyle}>
+            <button onClick={() => toggleFavorite(product.id)} style={favBtnStyle}>
+              🤍
+            </button>
+            <div style={imageWrapper}>
+              <img src={product.image_url} alt={product.name} style={imageStyle} />
             </div>
-          ))}
-        </div>
-      )}
+            <div style={infoStyle}>
+              <p style={brandStyle}>{product.brand}</p>
+              <h3 style={nameStyle}>{product.name}</h3>
+              <div style={priceTag}>{product.price} ₽</div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
 
-// --- Дизайн-система maimei ---
-
-const pageContainer: React.CSSProperties = {
-  maxWidth: '1200px',
-  margin: '0 auto',
-  padding: '0 20px 80px 20px',
-};
-
-const heroSection: React.CSSProperties = {
-  textAlign: 'center',
-  padding: '60px 0 40px 0',
-};
-
-const heroTitle: React.CSSProperties = {
-  fontFamily: "'Playfair Display', serif",
-  fontSize: '48px',
-  color: '#db7093',
-  marginBottom: '10px',
-  fontWeight: '700',
-};
-
-const heroSubtitle: React.CSSProperties = {
-  fontSize: '16px',
-  color: '#888',
-  maxWidth: '500px',
-  margin: '0 auto',
-  lineHeight: '1.6',
-};
-
-const gridStyle: React.CSSProperties = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-  gap: '40px',
-  marginTop: '20px'
-};
-
-const cardStyle: React.CSSProperties = {
-  background: '#fff',
-  borderRadius: '40px',
-  overflow: 'hidden',
-  boxShadow: '0 15px 35px rgba(219, 112, 147, 0.05)',
-  border: '1px solid rgba(219, 112, 147, 0.08)',
-  position: 'relative',
-  transition: 'transform 0.3s ease',
-};
-
-const badgeStyle: React.CSSProperties = {
-  position: 'absolute',
-  top: '20px',
-  left: '20px',
-  background: 'rgba(255, 255, 255, 0.9)',
-  padding: '5px 12px',
-  borderRadius: '20px',
-  fontSize: '11px',
-  fontWeight: 'bold',
-  color: '#db7093',
-  backdropFilter: 'blur(5px)',
-  zIndex: 2,
-};
-
-const imgStyle: React.CSSProperties = {
-  width: '100%',
-  height: '320px',
-  objectFit: 'cover',
-  backgroundColor: '#fdf2f6'
-};
-
-const contentStyle: React.CSSProperties = {
-  padding: '25px',
-  textAlign: 'center'
-};
-
-const productNameStyle: React.CSSProperties = {
-  fontSize: '18px',
-  margin: '0 0 10px 0',
-  color: '#333',
-  fontWeight: '500',
-  height: '44px',
-  overflow: 'hidden'
-};
-
-const productPrice: React.CSSProperties = {
-  color: '#db7093',
-  fontSize: '20px',
-  fontWeight: 'bold',
-  marginBottom: '20px'
-};
-
-const favBtn: React.CSSProperties = {
-  width: '100%',
-  background: 'linear-gradient(135deg, #ffafbd 0%, #ffc3a0 100%)',
-  color: '#fff',
-  border: 'none',
-  padding: '14px',
-  borderRadius: '20px',
-  cursor: 'pointer',
-  fontWeight: '600',
-  boxShadow: '0 4px 15px rgba(255, 175, 189, 0.3)',
-};
-
-const outlineBtn: React.CSSProperties = {
-  marginTop: '20px',
-  background: 'none',
-  border: '1px solid #db7093',
-  color: '#db7093',
-  padding: '12px 30px',
-  borderRadius: '25px',
-  cursor: 'pointer',
-  fontWeight: '600'
-};
-
-const centerText: React.CSSProperties = {
-  textAlign: 'center',
-  padding: '100px 20px',
-  color: '#888'
-};
+// Стили (сокращенно)
+const favBtnStyle: React.CSSProperties = { position: 'absolute', top: '15px', right: '15px', background: '#fff', border: 'none', borderRadius: '50%', width: '35px', height: '35px', cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', zIndex: 10 };
+const pageContainer: React.CSSProperties = { padding: '40px 20px', maxWidth: '1200px', margin: '0 auto' };
+const gridStyle: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '25px' };
+const cardStyle: React.CSSProperties = { background: '#fff', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 8px 15px rgba(0,0,0,0.05)', position: 'relative' };
+const imageWrapper: React.CSSProperties = { width: '100%', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' };
+const imageStyle: React.CSSProperties = { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' };
+const infoStyle: React.CSSProperties = { padding: '15px' };
+const brandStyle = { color: '#db7093', fontSize: '11px', fontWeight: 'bold' };
+const nameStyle = { fontSize: '15px', margin: '5px 0' };
+const priceTag = { fontSize: '16px', fontWeight: 'bold' };
+const centerStyle: React.CSSProperties = { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' };
+const emptyContainerStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '70vh' };
+const linkButtonStyle: React.CSSProperties = { padding: '10px 20px', background: '#db7093', color: '#fff', textDecoration: 'none', borderRadius: '20px', marginTop: '15px' };
 
 export default RecommendationsPage;

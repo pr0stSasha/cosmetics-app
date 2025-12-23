@@ -1,62 +1,54 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { supabase } from '../../supabaseClient';
-import type { Product } from '../../types'; // Убедись, что путь к папке types верный
-
-// Тип для записи из таблицы favorites
-interface FavoriteItem {
-  id: string;
-  user_id: string;
-  product_id: string;
-  products: Product; // Вложенный объект с данными товара
-}
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { supabase } from "../../supabaseClient";
 
 interface FavoritesState {
-  items: FavoriteItem[];
-  loading: boolean;
+  items: string[];
+  status: 'idle' | 'loading' | 'failed';
 }
 
 const initialState: FavoritesState = {
   items: [],
-  loading: false,
+  status: 'idle',
 };
 
-// 1. Асинхронный санка для загрузки избранного (Требование ТЗ по Redux Toolkit)
-export const fetchFavorites = createAsyncThunk(
-  'favorites/fetch',
-  async (userId: string) => {
-    const { data, error } = await supabase
-      .from('favorites')
-      .select('*, products(*)') // Подгружаем связанные данные о товаре
-      .eq('user_id', userId);
+export const fetchFavorites = createAsyncThunk("favorites/fetch", async (userId: string) => {
+  const { data, error } = await supabase.from("favorites").select("product_id").eq("user_id", userId);
+  if (error) throw error;
+  return data.map((fav) => fav.product_id);
+});
 
-    if (error) throw error;
-    return data as FavoriteItem[];
+export const toggleFavorite = createAsyncThunk(
+  "favorites/toggle",
+  async ({ userId, productId, isFavorite }: { userId: string; productId: string; isFavorite: boolean }) => {
+    if (isFavorite) {
+      const { error } = await supabase.from("favorites").delete().eq("user_id", userId).eq("product_id", productId);
+      if (error) throw error;
+      return { productId, removed: true };
+    } else {
+      const { error } = await supabase.from("favorites").insert([{ user_id: userId, product_id: productId }]);
+      if (error) throw error;
+      return { productId, removed: false };
+    }
   }
 );
 
 const favoritesSlice = createSlice({
-  name: 'favorites',
+  name: "favorites",
   initialState,
-  reducers: {
-    // Редюсер для очистки при выходе, если понадобится
-    clearFavorites: (state) => {
-      state.items = [];
-    }
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchFavorites.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(fetchFavorites.fulfilled, (state, action) => {
         state.items = action.payload;
-        state.loading = false;
       })
-      .addCase(fetchFavorites.rejected, (state) => {
-        state.loading = false;
+      .addCase(toggleFavorite.fulfilled, (state, action) => {
+        if (action.payload.removed) {
+          state.items = state.items.filter(id => id !== action.payload.productId);
+        } else {
+          state.items.push(action.payload.productId);
+        }
       });
   },
 });
 
-export const { clearFavorites } = favoritesSlice.actions;
 export default favoritesSlice.reducer;

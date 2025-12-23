@@ -1,6 +1,7 @@
-import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import { supabase } from '../../supabaseClient';
-import type { Product } from '../../types';
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { supabase } from "../../supabaseClient";
+import type { Product } from "../../types";
+import { toggleFavorite } from "../favorites/favoritesSlice";
 
 interface ProductsState {
   items: Product[];
@@ -14,29 +15,61 @@ const initialState: ProductsState = {
   error: null,
 };
 
-// GET: Получение товаров
-export const fetchProducts = createAsyncThunk('products/fetch', async (_, { rejectWithValue }) => {
+export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
   const { data, error } = await supabase.from('products').select('*').order('created_at', { ascending: false });
-  if (error) return rejectWithValue(error.message);
+  if (error) throw error;
   return data as Product[];
 });
 
-// DELETE: Удаление товара
-export const removeProduct = createAsyncThunk('products/remove', async (id: string, { rejectWithValue }) => {
-  const { error } = await supabase.from('products').delete().eq('id', id);
-  if (error) return rejectWithValue(error.message);
-  return id;
+export const fetchRecommendations = createAsyncThunk(
+  "products/fetchRecommendations",
+  async (userId: string) => {
+    const { data: profile } = await supabase.from("users_custom").select("*").eq("id", userId).single();
+    const { data: favorites } = await supabase.from("favorites").select("product_id").eq("user_id", userId);
+    const favoriteIds = favorites?.map(f => f.product_id) || [];
+
+    let query = supabase.from("products").select("*");
+
+    if (profile) {
+      if (profile.budget_segment) {
+        query = query.eq('budget_segment', profile.budget_segment);
+      }
+      const skinMap: Record<string, string> = { 
+        "Жирная": "oily", "Сухая": "dry", "Комбинированная": "combination", "Нормальная": "normal" 
+      };
+      const skinKey = skinMap[profile.skin_type] || profile.skin_type;
+      if (skinKey && skinKey !== 'all') {
+        query = query.filter('skin_type', 'cs', `{"${skinKey}"}`);
+      }
+    }
+
+    if (favoriteIds.length > 0) {
+      query = query.not('id', 'in', `(${favoriteIds.join(',')})`);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data as Product[];
+  }
+);
+
+// ЭТИ ЭКСПОРТЫ ИСПРАВЛЯЮТ ОШИБКУ В ADMINPAGE
+export const addProduct = createAsyncThunk('products/addProduct', async (newProduct: Partial<Product>) => {
+  const { data, error } = await supabase.from('products').insert([newProduct]).select().single();
+  if (error) throw error;
+  return data as Product;
 });
 
-// POST/PUT: Сохранение или обновление
-export const saveProduct = createAsyncThunk('products/save', async (product: Partial<Product>, { rejectWithValue }) => {
-  const isEdit = !!product.id;
-  const { data, error } = isEdit 
-    ? await supabase.from('products').update(product).eq('id', product.id).select()
-    : await supabase.from('products').insert([product]).select();
-  
-  if (error) return rejectWithValue(error.message);
-  return data[0] as Product;
+export const updateProduct = createAsyncThunk('products/updateProduct', async (product: Product) => {
+  const { data, error } = await supabase.from('products').update(product).eq('id', product.id).select().single();
+  if (error) throw error;
+  return data as Product;
+});
+
+export const deleteProduct = createAsyncThunk('products/deleteProduct', async (id: string) => {
+  const { error } = await supabase.from('products').delete().eq('id', id);
+  if (error) throw error;
+  return id;
 });
 
 const productsSlice = createSlice({
@@ -45,18 +78,30 @@ const productsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProducts.pending, (state) => { state.status = 'loading'; })
-      .addCase(fetchProducts.fulfilled, (state, action: PayloadAction<Product[]>) => {
+      .addCase(fetchProducts.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.items = action.payload;
       })
-      .addCase(removeProduct.fulfilled, (state, action: PayloadAction<string>) => {
-        state.items = state.items.filter((p: Product) => p.id !== action.payload);
+      .addCase(fetchRecommendations.fulfilled, (state, action) => {
+        state.status = 'succeeded';
+        state.items = action.payload;
       })
-      .addCase(saveProduct.fulfilled, (state, action: PayloadAction<Product>) => {
-        const index = state.items.findIndex((p: Product) => p.id === action.payload.id);
+      .addCase(addProduct.fulfilled, (state, action) => {
+        state.items.unshift(action.payload);
+      })
+      .addCase(updateProduct.fulfilled, (state, action) => {
+        const index = state.items.findIndex(item => item.id === action.payload.id);
         if (index !== -1) state.items[index] = action.payload;
-        else state.items.unshift(action.payload);
+      })
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.items = state.items.filter(item => item.id !== action.payload);
+      })
+      // МОМЕНТАЛЬНОЕ ИСЧЕЗНОВЕНИЕ ПРИ ЛАЙКЕ
+      .addCase(toggleFavorite.fulfilled, (state, action) => {
+        const { productId, removed } = action.payload;
+        if (!removed) {
+          state.items = state.items.filter(item => item.id !== productId);
+        }
       });
   },
 });
