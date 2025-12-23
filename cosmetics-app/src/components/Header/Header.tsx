@@ -1,73 +1,40 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAppSelector, useAppDispatch } from '../../app/hooks';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '../../app/store';
 import { logout } from '../../features/auth/authSlice';
 
-export const Header = () => {
-  const dispatch = useAppDispatch();
-  const favoritesCount = useAppSelector((state) => state.favorites.items.length);
-
-  const navLinkStyle = {
-    textDecoration: 'none',
-    color: '#333',
-    fontWeight: 500,
-    fontSize: '14px'
-  };
+const Header: React.FC = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
 
   return (
-    <header style={{ 
-      display: 'flex', 
-      justifyContent: 'space-between', 
-      alignItems: 'center', 
-      padding: '15px 30px', 
-      background: '#fff', 
-      boxShadow: '0 2px 4px rgba(0,0,0,0.05)' 
-    }}>
-      <div className="logo" style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>
-        CosmeticsApp
-      </div>
-
-      <nav style={{ display: 'flex', gap: '25px', alignItems: 'center' }}>
-        <Link to="/recommendations" style={navLinkStyle}>
-          Рекомендации
-        </Link>
+    <header style={headerStyle}>
+      <Link to="/" style={logoStyle}>Glowly ✨</Link>
+      <nav style={navStyle}>
+        <Link to="/" style={linkStyle}>Главная</Link>
+        {user && <Link to="/favorites" style={linkStyle}>Избранное</Link>}
+        {user?.isAdmin && <Link to="/admin" style={adminLinkStyle}>Админка 👑</Link>}
         
-        {/* Добавленный раздел Избранное */}
-        <Link to="/favorites" style={{ ...navLinkStyle, position: 'relative' }}>
-          Избранное
-          {favoritesCount > 0 && (
-            <span style={{
-              position: 'absolute',
-              top: '-8px',
-              right: '-15px',
-              background: '#e8a0bf',
-              color: '#fff',
-              borderRadius: '50%',
-              padding: '2px 6px',
-              fontSize: '10px'
-            }}>
-              {favoritesCount}
-            </span>
-          )}
-        </Link>
-
-        <Link to="/profile" style={navLinkStyle}>
-          Профиль
-        </Link>
-
-        <button 
-          onClick={() => dispatch(logout())}
-          style={{
-            padding: '8px 16px',
-            background: '#f5f5f5',
-            border: '1px solid #ddd',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            marginLeft: '10px'
-          }}
-        >
-          Выйти
-        </button>
+        {user ? (
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '15px' }}>
+            <Link to="/profile" style={linkStyle}>👤 {user.username}</Link>
+            <button onClick={() => dispatch(logout())} style={logoutBtn}>Выйти</button>
+          </div>
+        ) : (
+          <Link to="/auth" style={linkStyle}>Войти</Link>
+        )}
       </nav>
     </header>
   );
 };
+
+// Стили (коротко)
+const headerStyle = { display: 'flex', justifyContent: 'space-between', padding: '20px 50px', background: '#fff', borderBottom: '1px solid #eee' };
+const logoStyle = { fontSize: '24px', fontWeight: 'bold', color: '#db7093', textDecoration: 'none' };
+const navStyle = { display: 'flex', gap: '20px', alignItems: 'center' };
+const linkStyle = { textDecoration: 'none', color: '#666' };
+const adminLinkStyle = { ...linkStyle, color: '#db7093', fontWeight: 'bold' };
+const logoutBtn = { background: 'none', border: '1px solid #ddd', padding: '5px 10px', borderRadius: '8px', cursor: 'pointer' };
+
+export default Header;

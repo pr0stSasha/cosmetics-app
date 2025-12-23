@@ -1,16 +1,18 @@
 export interface User {
   id: string;
-  name: string;
-  email: string;
-  password?: string;
-  isAdmin: boolean;
-  survey?: SurveyAnswers;
+  email?: string;
+  username?: string;
+  isAdmin: boolean; 
 }
 
 export interface Product {
   id: string;
   name: string;
-  category: string;
+  brand: string | null;
+  price: number;
+  description: string | null;
+  image_url: string;
+  category: string | null;
 }
 
 export interface SurveyAnswers {
