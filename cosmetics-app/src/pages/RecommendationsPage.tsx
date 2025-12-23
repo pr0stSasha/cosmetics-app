@@ -91,7 +91,7 @@ const RecommendationsPage: React.FC = () => {
               <img src={product.image_url} alt={product.name} style={imageStyle} />
             </div>
             <div style={infoStyle}>
-              <p style={brandStyle}>{product.brand}</p>
+              <p style={urlStyle}>{product.product_url}</p>
               <h3 style={nameStyle}>{product.name}</h3>
               <div style={priceTag}>{product.price} ₽</div>
             </div>
@@ -110,7 +110,7 @@ const cardStyle: React.CSSProperties = { background: '#fff', borderRadius: '20px
 const imageWrapper: React.CSSProperties = { width: '100%', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px' };
 const imageStyle: React.CSSProperties = { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' };
 const infoStyle: React.CSSProperties = { padding: '15px' };
-const brandStyle = { color: '#db7093', fontSize: '11px', fontWeight: 'bold' };
+const urlStyle = { color: '#db7093', fontSize: '11px', fontWeight: 'bold' };
 const nameStyle = { fontSize: '15px', margin: '5px 0' };
 const priceTag = { fontSize: '16px', fontWeight: 'bold' };
 const centerStyle: React.CSSProperties = { display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' };

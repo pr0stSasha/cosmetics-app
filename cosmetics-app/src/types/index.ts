@@ -15,10 +15,10 @@ export interface AppUser {
 export interface Product {
   id: string;
   name: string;
-  brand: string;
+  product_url: string;
   price: number;
   category_type: 'care' | 'makeup'; 
-  skin_type: string[]; // ['dry', 'oily']
+  skin_type: string[];
   budget_segment: 'budget' | 'medium' | 'luxury';
   image_url: string;
   description?: string;

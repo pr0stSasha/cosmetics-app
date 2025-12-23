@@ -1,139 +1,225 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, addProduct, deleteProduct, updateProduct } from '../features/products/productsSlice';
+import { 
+  fetchProducts, 
+  addProduct, 
+  deleteProduct,
+  updateProduct 
+} from '../features/products/productsSlice';
+
 import type { RootState, AppDispatch } from '../app/store';
 import type { Product } from '../types';
 
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { items: products } = useSelector((state: RootState) => state.products);
+  const { items, loading } = useSelector((state: RootState) => state.products);
 
-  const [editId, setEditId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Partial<Product>>({
-    name: '', brand: '', price: 0, category_type: 'care', 
-    skin_type: [], budget_segment: 'medium', image_url: ''
-  });
+  // Список типов кожи на русском (но в базу отправляем ключи, чтобы фильтры не сломались)
+  const skinTypes = [
+    { id: 'dry', label: 'Сухая' },
+    { id: 'oily', label: 'Жирная' },
+    { id: 'combination', label: 'Комбинированная' },
+    { id: 'normal', label: 'Нормальная' },
+    { id: 'sensitive', label: 'Чувствительная' }
+  ];
 
-  useEffect(() => { dispatch(fetchProducts()); }, [dispatch]);
+  const [isEditing, setIsEditing] = useState(false);
+  const [currentId, setCurrentId] = useState<string | null>(null);
 
-  const allSkins = ['normal', 'dry', 'oily', 'combination'];
-  const isAllSelected = formData.skin_type?.length === allSkins.length;
-
-  const handleSkinTypeToggle = (type: string) => {
-    const current = formData.skin_type || [];
-    const next = current.includes(type) ? current.filter(t => t !== type) : [...current, type];
-    setFormData({ ...formData, skin_type: next });
+  const initialFormState: Partial<Product> = {
+    name: '',
+    product_url: '',
+    price: 0,
+    category_type: 'care',
+    budget_segment: 'medium',
+    skin_type: [],
+    image_url: ''
   };
 
-  const toggleAllSkins = () => {
-    setFormData({ ...formData, skin_type: isAllSelected ? [] : allSkins });
-  };
+  const [form, setForm] = useState<Partial<Product>>(initialFormState);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // Макияж всегда подходит всем типам кожи
-    const finalData = formData.category_type === 'makeup' 
-      ? { ...formData, skin_type: allSkins } 
-      : formData;
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, [dispatch]);
 
-    if (editId) {
-      await dispatch(updateProduct({ ...finalData, id: editId } as Product));
+  const handleSkinTypeChange = (typeId: string) => {
+    const currentTypes = form.skin_type || [];
+    if (currentTypes.includes(typeId)) {
+      setForm({ ...form, skin_type: currentTypes.filter(t => t !== typeId) });
     } else {
-      await dispatch(addProduct(finalData));
+      setForm({ ...form, skin_type: [...currentTypes, typeId] });
     }
-    resetForm();
   };
 
-  const resetForm = () => {
-    setEditId(null);
-    setFormData({ name: '', brand: '', price: 0, category_type: 'care', skin_type: [], budget_segment: 'medium', image_url: '' });
+  const startEdit = (product: Product) => {
+    setIsEditing(true);
+    setCurrentId(product.id);
+    setForm(product);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const startEdit = (p: Product) => {
-    setEditId(p.id);
-    setFormData(p);
+  const cancelEdit = () => {
+    setIsEditing(false);
+    setCurrentId(null);
+    setForm(initialFormState);
   };
+
+  const handleSave = () => {
+    if (form.name && form.product_url && form.image_url) {
+      if (isEditing && currentId) {
+        dispatch(updateProduct({ ...form, id: currentId } as Product));
+        setIsEditing(false);
+        setCurrentId(null);
+      } else {
+        dispatch(addProduct(form as Omit<Product, 'id'>));
+      }
+      setForm(initialFormState);
+    } else {
+      alert("Пожалуйста, заполните основные поля.");
+    }
+  };
+
+  if (loading) return <div style={loadingStyle}>✨ Загрузка базы данных...</div>;
 
   return (
-    <div style={{ padding: '30px', maxWidth: '1000px', margin: '0 auto' }}>
-      <h2 style={{ color: '#db7093' }}>{editId ? '📝 Редактирование' : '➕ Добавить продукт'}</h2>
-      
-      <form onSubmit={handleSubmit} style={formGrid}>
-        <input placeholder="Название" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} style={inputStyle} required />
-        <input placeholder="Бренд" value={formData.brand} onChange={e => setFormData({...formData, brand: e.target.value})} style={inputStyle} required />
-        <input placeholder="Цена" type="number" value={formData.price} onChange={e => setFormData({...formData, price: Number(e.target.value)})} style={inputStyle} required />
-        <input placeholder="URL картинки" value={formData.image_url} onChange={e => setFormData({...formData, image_url: e.target.value})} style={inputStyle} />
+    <div style={adminContainer}>
+      <h2 style={headerStyle}>Панель администратора 🛠️</h2>
+
+      <div style={formCard}>
+        <h3 style={{ marginTop: 0 }}>
+          {isEditing ? `Редактирование: ${form.name}` : 'Добавить новый продукт'}
+        </h3>
         
-        <select 
-          value={formData.category_type} 
-          onChange={e => setFormData({...formData, category_type: e.target.value as 'care' | 'makeup'})} 
-          style={inputStyle}
-        >
-          <option value="care">Уход (Care)</option>
-          <option value="makeup">Макияж (Makeup)</option>
-        </select>
+        <div style={gridInputs}>
+          <div style={inputWrapper}>
+            <label style={labelStyle}>Название</label>
+            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={inputStyle} />
+          </div>
+          <div style={inputWrapper}>
+            <label style={labelStyle}>Ссылка на товар</label>
+            <input value={form.product_url} onChange={e => setForm({...form, product_url: e.target.value})} style={inputStyle} />
+          </div>
+          <div style={inputWrapper}>
+            <label style={labelStyle}>Цена (₽)</label>
+            <input type="number" value={form.price || ''} onChange={e => setForm({...form, price: Number(e.target.value)})} style={inputStyle} />
+          </div>
+          <div style={inputWrapper}>
+            <label style={labelStyle}>URL изображения</label>
+            <input value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} style={inputStyle} />
+          </div>
+          <div style={inputWrapper}>
+            <label style={labelStyle}>Категория</label>
+            <select 
+              value={form.category_type} 
+              onChange={e => {
+                const val = e.target.value as 'care' | 'makeup';
+                setForm({
+                  ...form, 
+                  category_type: val,
+                  skin_type: val === 'makeup' ? skinTypes.map(s => s.id) : []
+                });
+              }} 
+              style={inputStyle}
+            >
+              <option value="care">Уход</option>
+              <option value="makeup">Макияж</option>
+            </select>
+          </div>
+          <div style={inputWrapper}>
+            <label style={labelStyle}>Бюджет</label>
+            <select 
+              value={form.budget_segment} 
+              onChange={e => setForm({...form, budget_segment: e.target.value as 'budget' | 'medium' | 'luxury'})} 
+              style={inputStyle}
+            >
+              <option value="budget">Бюджетный</option>
+              <option value="medium">Мидл-маркет</option>
+              <option value="luxury">Люкс</option>
+            </select>
+          </div>
+        </div>
 
-        <select 
-          value={formData.budget_segment} 
-          onChange={e => setFormData({...formData, budget_segment: e.target.value as 'budget' | 'medium' | 'luxury'})} 
-          style={inputStyle}
-        >
-          <option value="budget">Эконом</option>
-          <option value="medium">Мидл</option>
-          <option value="luxury">Люкс</option>
-        </select>
-
-        {formData.category_type === 'care' && (
-          <div style={{ gridColumn: '1 / -1', padding: '15px', background: '#fdf2f6', borderRadius: '15px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '10px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 'bold' }}>Типы кожи:</span>
-              <button 
-                type="button" 
-                onClick={toggleAllSkins} 
-                style={{
-                  ...smallBtn, 
-                  background: isAllSelected ? '#db7093' : '#fff',
-                  color: isAllSelected ? '#fff' : '#db7093',
-                  border: '1px solid #db7093'
-                }}
-              >
-                {isAllSelected ? 'Снять всё' : 'Выделить все'}
-              </button>
+        {form.category_type !== 'makeup' && (
+          <div style={skinTypeSection}>
+            <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>Для какой кожи подходит:</label>
+            <div style={checkboxGroup}>
+              {skinTypes.map(type => (
+                <label key={type.id} style={checkboxLabel}>
+                  <input 
+                    type="checkbox" 
+                    checked={form.skin_type?.includes(type.id)} 
+                    onChange={() => handleSkinTypeChange(type.id)}
+                  /> {type.label}
+                </label>
+              ))}
             </div>
-            {allSkins.map(t => (
-              <label key={t} style={{ marginRight: '15px', cursor: 'pointer' }}>
-                <input type="checkbox" checked={formData.skin_type?.includes(t)} onChange={() => handleSkinTypeToggle(t)} /> {t}
-              </label>
-            ))}
           </div>
         )}
 
-        <button type="submit" style={saveBtn}>{editId ? 'Обновить' : 'Создать'}</button>
-        {editId && <button type="button" onClick={resetForm} style={cancelBtn}>Отмена</button>}
-      </form>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '30px' }}>
+          <button onClick={handleSave} style={isEditing ? updateBtnStyle : addBtnStyle}>
+            {isEditing ? 'Сохранить изменения' : 'Добавить товар'}
+          </button>
+          {isEditing && (
+            <button onClick={cancelEdit} style={cancelBtnStyle}>Отмена</button>
+          )}
+        </div>
+      </div>
 
-      <div style={{ marginTop: '40px' }}>
-        {products.map(p => (
-          <div key={p.id} style={productRow}>
-            <span><b>[{p.brand}]</b> {p.name} — {p.price}₽ <i>({p.category_type})</i></span>
-            <div>
-              <button onClick={() => startEdit(p)} style={editBtn}>✎</button>
-              <button onClick={() => dispatch(deleteProduct(p.id))} style={delBtn}>✕</button>
-            </div>
-          </div>
-        ))}
+      <div style={tableWrapper}>
+        <table style={tableStyle}>
+          <thead>
+            <tr style={tableHeaderRow}>
+              <th style={thStyle}>Фото</th>
+              <th style={thStyle}>Название</th>
+              <th style={thStyle}>Ссылка на товар</th>
+              <th style={thStyle}>Цена</th>
+              <th style={thStyle}>Действия</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((p: Product) => (
+              <tr key={p.id} style={trStyle}>
+                <td style={tdStyle}><img src={p.image_url} alt="" style={imgThumb} /></td>
+                <td style={tdStyle}><strong>{p.name}</strong></td>
+                <td style={tdStyle}>{p.product_url}</td>
+                <td style={tdStyle}>{p.price} ₽</td>
+                <td style={tdStyle}>
+                  <button onClick={() => startEdit(p)} style={editLinkStyle}>Ред.</button>
+                  <button onClick={() => dispatch(deleteProduct(p.id))} style={deleteLinkStyle}>Удалить</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
 };
 
-const formGrid: React.CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', padding: '20px', background: '#fff', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)' };
-const inputStyle = { padding: '12px', borderRadius: '10px', border: '1px solid #eee' };
-const saveBtn = { background: '#db7093', color: '#fff', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold' };
-const cancelBtn = { background: '#eee', color: '#666', border: 'none', padding: '12px', borderRadius: '10px', cursor: 'pointer', marginLeft: '10px' };
-const smallBtn = { borderRadius: '5px', padding: '2px 10px', fontSize: '12px', cursor: 'pointer', transition: '0.3s' };
-const productRow = { display: 'flex', justifyContent: 'space-between', padding: '15px', background: '#fff', borderRadius: '12px', border: '1px solid #fdf2f6', marginBottom: '8px' };
-const editBtn = { background: '#ffc3a0', border: 'none', padding: '5px 10px', marginRight: '5px', cursor: 'pointer', borderRadius: '5px' };
-const delBtn = { background: '#ffafbd', border: 'none', padding: '5px 10px', cursor: 'pointer', borderRadius: '5px' };
+// --- СТИЛИ ---
+const adminContainer: React.CSSProperties = { padding: '40px 20px', maxWidth: '1100px', margin: '0 auto', fontFamily: 'Arial, sans-serif' };
+const headerStyle: React.CSSProperties = { color: '#db7093', textAlign: 'center', marginBottom: '30px' };
+const formCard: React.CSSProperties = { background: '#fff', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)' };
+const gridInputs: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' };
+const inputWrapper: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '5px' };
+const labelStyle: React.CSSProperties = { fontSize: '13px', color: '#666', fontWeight: 'bold' };
+const inputStyle: React.CSSProperties = { padding: '12px', borderRadius: '10px', border: '1px solid #eee', fontSize: '14px', outline: 'none' };
+const skinTypeSection: React.CSSProperties = { marginTop: '25px', borderTop: '1px solid #f5f5f5', paddingTop: '20px' };
+const checkboxGroup: React.CSSProperties = { display: 'flex', gap: '20px', flexWrap: 'wrap' };
+const checkboxLabel: React.CSSProperties = { fontSize: '14px', cursor: 'pointer' };
+const addBtnStyle: React.CSSProperties = { flex: 2, padding: '15px', background: '#db7093', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' };
+const updateBtnStyle: React.CSSProperties = { flex: 2, padding: '15px', background: '#4CAF50', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' };
+const cancelBtnStyle: React.CSSProperties = { flex: 1, padding: '15px', background: '#ccc', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' };
+const tableWrapper: React.CSSProperties = { marginTop: '50px', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' };
+const tableStyle: React.CSSProperties = { width: '100%', borderCollapse: 'collapse', background: '#fff' };
+const tableHeaderRow: React.CSSProperties = { background: '#fdf2f5' };
+const thStyle: React.CSSProperties = { padding: '15px', color: '#db7093', textAlign: 'left' };
+const trStyle: React.CSSProperties = { borderBottom: '1px solid #f9f9f9' };
+const tdStyle: React.CSSProperties = { padding: '15px', fontSize: '14px' };
+const imgThumb: React.CSSProperties = { width: '40px', height: '40px', objectFit: 'contain' };
+const editLinkStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#3498db', cursor: 'pointer', marginRight: '15px', fontWeight: 'bold' };
+const deleteLinkStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontWeight: 'bold' };
+const loadingStyle: React.CSSProperties = { textAlign: 'center', padding: '100px', color: '#db7093', fontSize: '18px' };
 
 export default AdminPage;

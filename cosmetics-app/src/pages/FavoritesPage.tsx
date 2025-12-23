@@ -96,7 +96,7 @@ const FavoritesPage: React.FC = () => {
               <img src={product.image_url} alt={product.name} style={imageStyle} />
             </div>
             <div style={infoStyle}>
-              <p style={brandStyle}>{product.brand}</p>
+              <p style={urlStyle}>{product.product_url}</p>
               <h3 style={nameStyle}>{product.name}</h3>
               <div style={priceTag}>{product.price} ₽</div>
             </div>
@@ -168,7 +168,7 @@ const infoStyle: React.CSSProperties = {
   textAlign: 'left',
 };
 
-const brandStyle = { color: '#db7093', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' as const };
+const urlStyle = { color: '#db7093', fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase' as const };
 const nameStyle = { fontSize: '15px', margin: '5px 0', color: '#333', height: '40px', overflow: 'hidden' };
 const priceTag = { fontSize: '18px', fontWeight: 'bold', color: '#333' };
 
