@@ -23,7 +23,3 @@ export interface Product {
   image_url: string;
   description?: string;
 }
-
-export interface SurveyAnswers {
-  [key: string]: boolean;
-}

@@ -20,3 +20,20 @@ body {
   margin: 0 auto;
   padding: 40px 20px;
 }
+
+* {
+  box-sizing: border-box; /* Чтобы padding не раздувал ширину блоков */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Запрещает горизонтальную прокрутку */
+  width: 100%;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}

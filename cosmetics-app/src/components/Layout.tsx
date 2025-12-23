@@ -1,14 +1,20 @@
 import React from 'react';
-import Header from './Header/Header';
-import styles from './Layout.module.css';
+import Header from './Header/Header'; // Проверь правильность пути к Хедеру
+import s from './Layout.module.css';
 
-export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface LayoutProps {
+  children: React.ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
-    <div className={styles.wrapper}>
+    <div className={s.layout}>
       <Header />
-      <main className={styles.container}>
+      <main className={s.main}>
         {children}
       </main>
     </div>
   );
 };
+
+export default Layout;

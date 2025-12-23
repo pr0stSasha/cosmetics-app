@@ -1,9 +1,25 @@
-.wrapper {
+/* Основной контейнер, который держит всё приложение */
+.layout {
+  display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  width: 100%;
+  background-color: #fdfbfb;
 }
 
-.container {
-  max-width: 1200px; /* Контент больше не будет расползаться */
+/* Контейнер для контента страниц */
+.main {
+  flex: 1; /* Растягивает контент, чтобы футер всегда был внизу */
+  width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 20px;
+}
+
+/* --- Адаптивность --- */
+
+@media (max-width: 768px) {
+  .main {
+    padding: 15px 10px; /* Уменьшаем отступы на планшетах и телефонах */
+  }
 }
