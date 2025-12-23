@@ -8,11 +8,11 @@ export interface User {
 export interface Product {
   id: string;
   name: string;
-  brand: string | null;
   price: number;
-  description: string | null;
   image_url: string;
-  category: string | null;
+  skin_type: string[];
+  budget_segment: string;
+  category_type: string;
 }
 
 export interface SurveyAnswers {
