@@ -1,0 +1,103 @@
+/* src/pages/AuthPage.module.css */
+
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    padding: 20px;
+}
+
+.card {
+    background: #fff;
+    padding: 40px;
+    border-radius: 30px;
+    box-shadow: 0 15px 35px rgba(219, 112, 147, 0.1);
+    width: 100%;
+    max-width: 400px;
+}
+
+.title {
+    text-align: center;
+    color: #db7093;
+    margin-bottom: 30px;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    font-size: 14px;
+    color: #888;
+}
+
+.input {
+    padding: 14px;
+    border-radius: 15px;
+    border: 1px solid #f0f0f0;
+    outline: none;
+    background-color: #fafafa;
+    font-size: 16px; /* Важно для iOS, чтобы не увеличивало при фокусе */
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    border-color: #db7093;
+}
+
+.btn {
+    background: linear-gradient(135deg, #db7093 0%, #ffb6c1 100%);
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 16px;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.toggle {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #db7093;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.errorBox {
+    color: #ff4d4f;
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 20px;
+    background: #fff1f0;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #ffa39e;
+}
+
+/* --- Адаптивность --- */
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .card {
+        padding: 30px 20px;
+        box-shadow: none; /* На мобилках можно убрать тень для чистоты */
+    }
+}

@@ -10,11 +10,13 @@ import {
 import type { RootState, AppDispatch } from '../app/store';
 import type { Product } from '../types';
 
+// Импорт стилей
+import s from '../features/admin/Admin.module.css';
+
 const AdminPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { items, loading } = useSelector((state: RootState) => state.products);
 
-  // Список типов кожи на русском (но в базу отправляем ключи, чтобы фильтры не сломались)
   const skinTypes = [
     { id: 'dry', label: 'Сухая' },
     { id: 'oily', label: 'Жирная' },
@@ -79,36 +81,36 @@ const AdminPage: React.FC = () => {
     }
   };
 
-  if (loading) return <div style={loadingStyle}>✨ Загрузка базы данных...</div>;
+  if (loading) return <div className={s.loading}>✨ Загрузка базы данных...</div>;
 
   return (
-    <div style={adminContainer}>
-      <h2 style={headerStyle}>Панель администратора 🛠️</h2>
+    <div className={s.adminContainer}>
+      <h2 className={s.header}>Панель администратора 🛠️</h2>
 
-      <div style={formCard}>
+      <div className={s.formCard}>
         <h3 style={{ marginTop: 0 }}>
           {isEditing ? `Редактирование: ${form.name}` : 'Добавить новый продукт'}
         </h3>
         
-        <div style={gridInputs}>
-          <div style={inputWrapper}>
-            <label style={labelStyle}>Название</label>
-            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} style={inputStyle} />
+        <div className={s.gridInputs}>
+          <div className={s.inputWrapper}>
+            <label className={s.label}>Название</label>
+            <input value={form.name} onChange={e => setForm({...form, name: e.target.value})} className={s.input} />
           </div>
-          <div style={inputWrapper}>
-            <label style={labelStyle}>Ссылка на товар</label>
-            <input value={form.product_url} onChange={e => setForm({...form, product_url: e.target.value})} style={inputStyle} />
+          <div className={s.inputWrapper}>
+            <label className={s.label}>Ссылка на товар</label>
+            <input value={form.product_url} onChange={e => setForm({...form, product_url: e.target.value})} className={s.input} />
           </div>
-          <div style={inputWrapper}>
-            <label style={labelStyle}>Цена (₽)</label>
-            <input type="number" value={form.price || ''} onChange={e => setForm({...form, price: Number(e.target.value)})} style={inputStyle} />
+          <div className={s.inputWrapper}>
+            <label className={s.label}>Цена (₽)</label>
+            <input type="number" value={form.price || ''} onChange={e => setForm({...form, price: Number(e.target.value)})} className={s.input} />
           </div>
-          <div style={inputWrapper}>
-            <label style={labelStyle}>URL изображения</label>
-            <input value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} style={inputStyle} />
+          <div className={s.inputWrapper}>
+            <label className={s.label}>URL изображения</label>
+            <input value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} className={s.input} />
           </div>
-          <div style={inputWrapper}>
-            <label style={labelStyle}>Категория</label>
+          <div className={s.inputWrapper}>
+            <label className={s.label}>Категория</label>
             <select 
               value={form.category_type} 
               onChange={e => {
@@ -119,32 +121,32 @@ const AdminPage: React.FC = () => {
                   skin_type: val === 'makeup' ? skinTypes.map(s => s.id) : []
                 });
               }} 
-              style={inputStyle}
+              className={s.input}
             >
               <option value="care">Уход</option>
               <option value="makeup">Макияж</option>
             </select>
           </div>
-          <div style={inputWrapper}>
-            <label style={labelStyle}>Бюджет</label>
+          <div className={s.inputWrapper}>
+            <label className={s.label}>Бюджет</label>
             <select 
               value={form.budget_segment} 
               onChange={e => setForm({...form, budget_segment: e.target.value as 'budget' | 'medium' | 'luxury'})} 
-              style={inputStyle}
+              className={s.input}
             >
               <option value="budget">Бюджетный</option>
-              <option value="medium">Мидл-маркет</option>
+              <option value="medium">Миддл-маркет</option>
               <option value="luxury">Люкс</option>
             </select>
           </div>
         </div>
 
         {form.category_type !== 'makeup' && (
-          <div style={skinTypeSection}>
+          <div className={s.skinTypeSection}>
             <label style={{ fontWeight: 'bold', marginBottom: '10px', display: 'block' }}>Для какой кожи подходит:</label>
-            <div style={checkboxGroup}>
+            <div className={s.checkboxGroup}>
               {skinTypes.map(type => (
-                <label key={type.id} style={checkboxLabel}>
+                <label key={type.id} className={s.checkboxLabel}>
                   <input 
                     type="checkbox" 
                     checked={form.skin_type?.includes(type.id)} 
@@ -156,37 +158,37 @@ const AdminPage: React.FC = () => {
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: '10px', marginTop: '30px' }}>
-          <button onClick={handleSave} style={isEditing ? updateBtnStyle : addBtnStyle}>
+        <div className={s.buttonGroup}>
+          <button onClick={handleSave} className={isEditing ? s.updateBtn : s.addBtn}>
             {isEditing ? 'Сохранить изменения' : 'Добавить товар'}
           </button>
           {isEditing && (
-            <button onClick={cancelEdit} style={cancelBtnStyle}>Отмена</button>
+            <button onClick={cancelEdit} className={s.cancelBtn}>Отмена</button>
           )}
         </div>
       </div>
 
-      <div style={tableWrapper}>
-        <table style={tableStyle}>
+      <div className={s.tableWrapper}>
+        <table className={s.table}>
           <thead>
-            <tr style={tableHeaderRow}>
-              <th style={thStyle}>Фото</th>
-              <th style={thStyle}>Название</th>
-              <th style={thStyle}>Ссылка на товар</th>
-              <th style={thStyle}>Цена</th>
-              <th style={thStyle}>Действия</th>
+            <tr className={s.tr}>
+              <th className={s.th}>Фото</th>
+              <th className={s.th}>Название</th>
+              <th className={s.th}>Ссылка</th>
+              <th className={s.th}>Цена</th>
+              <th className={s.th}>Действия</th>
             </tr>
           </thead>
           <tbody>
             {items.map((p: Product) => (
-              <tr key={p.id} style={trStyle}>
-                <td style={tdStyle}><img src={p.image_url} alt="" style={imgThumb} /></td>
-                <td style={tdStyle}><strong>{p.name}</strong></td>
-                <td style={tdStyle}>{p.product_url}</td>
-                <td style={tdStyle}>{p.price} ₽</td>
-                <td style={tdStyle}>
-                  <button onClick={() => startEdit(p)} style={editLinkStyle}>Ред.</button>
-                  <button onClick={() => dispatch(deleteProduct(p.id))} style={deleteLinkStyle}>Удалить</button>
+              <tr key={p.id} className={s.tr}>
+                <td className={s.td} data-label="Фото"><img src={p.image_url} alt="" className={s.imgThumb} /></td>
+                <td className={s.td} data-label="Название"><strong>{p.name}</strong></td>
+                <td className={s.td} data-label="Ссылка">{p.product_url}</td>
+                <td className={s.td} data-label="Цена">{p.price} ₽</td>
+                <td className={s.td} data-label="Действия">
+                  <button onClick={() => startEdit(p)} className={s.editBtn}>Ред.</button>
+                  <button onClick={() => dispatch(deleteProduct(p.id))} className={s.deleteBtn}>Удалить</button>
                 </td>
               </tr>
             ))}
@@ -196,30 +198,5 @@ const AdminPage: React.FC = () => {
     </div>
   );
 };
-
-// --- СТИЛИ ---
-const adminContainer: React.CSSProperties = { padding: '40px 20px', maxWidth: '1100px', margin: '0 auto', fontFamily: 'Arial, sans-serif' };
-const headerStyle: React.CSSProperties = { color: '#db7093', textAlign: 'center', marginBottom: '30px' };
-const formCard: React.CSSProperties = { background: '#fff', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.08)' };
-const gridInputs: React.CSSProperties = { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px' };
-const inputWrapper: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '5px' };
-const labelStyle: React.CSSProperties = { fontSize: '13px', color: '#666', fontWeight: 'bold' };
-const inputStyle: React.CSSProperties = { padding: '12px', borderRadius: '10px', border: '1px solid #eee', fontSize: '14px', outline: 'none' };
-const skinTypeSection: React.CSSProperties = { marginTop: '25px', borderTop: '1px solid #f5f5f5', paddingTop: '20px' };
-const checkboxGroup: React.CSSProperties = { display: 'flex', gap: '20px', flexWrap: 'wrap' };
-const checkboxLabel: React.CSSProperties = { fontSize: '14px', cursor: 'pointer' };
-const addBtnStyle: React.CSSProperties = { flex: 2, padding: '15px', background: '#db7093', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' };
-const updateBtnStyle: React.CSSProperties = { flex: 2, padding: '15px', background: '#4CAF50', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' };
-const cancelBtnStyle: React.CSSProperties = { flex: 1, padding: '15px', background: '#ccc', color: '#fff', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold' };
-const tableWrapper: React.CSSProperties = { marginTop: '50px', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 15px rgba(0,0,0,0.05)' };
-const tableStyle: React.CSSProperties = { width: '100%', borderCollapse: 'collapse', background: '#fff' };
-const tableHeaderRow: React.CSSProperties = { background: '#fdf2f5' };
-const thStyle: React.CSSProperties = { padding: '15px', color: '#db7093', textAlign: 'left' };
-const trStyle: React.CSSProperties = { borderBottom: '1px solid #f9f9f9' };
-const tdStyle: React.CSSProperties = { padding: '15px', fontSize: '14px' };
-const imgThumb: React.CSSProperties = { width: '40px', height: '40px', objectFit: 'contain' };
-const editLinkStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#3498db', cursor: 'pointer', marginRight: '15px', fontWeight: 'bold' };
-const deleteLinkStyle: React.CSSProperties = { background: 'none', border: 'none', color: '#e74c3c', cursor: 'pointer', fontWeight: 'bold' };
-const loadingStyle: React.CSSProperties = { textAlign: 'center', padding: '100px', color: '#db7093', fontSize: '18px' };
 
 export default AdminPage;

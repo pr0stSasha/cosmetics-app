@@ -1,0 +1,157 @@
+
+.pageContainer {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    color: #db7093;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.grid {
+    display: grid;
+    /* Умная сетка: на десктопе от 220px */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.removeBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 10;
+    font-size: 18px;
+}
+
+.imageWrapper {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.info {
+    padding: 20px;
+    text-align: left;
+}
+
+.brandUrl {
+    color: #db7093;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.name {
+    font-size: 15px;
+    margin: 5px 0;
+    color: #333;
+    height: 40px;
+    overflow: hidden;
+}
+
+.price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Состояния загрузки и пустоты */
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+    color: #db7093;
+    font-size: 20px;
+}
+
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+    text-align: center;
+}
+
+.linkButton {
+    padding: 12px 30px;
+    background: #db7093;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(219, 112, 147, 0.4);
+    margin-top: 15px;
+}
+
+/* --- Адаптивность --- */
+
+@media (max-width: 768px) {
+    .grid {
+        /* На планшетах делаем карточки чуть компактнее */
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+    }
+    .imageWrapper {
+        height: 150px;
+    }
+    .info {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .pageContainer {
+        padding: 20px 10px;
+    }
+    .grid {
+        /* На телефонах строго 2 карточки в ряд */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    .name {
+        font-size: 13px;
+        height: 34px;
+    }
+    .price {
+        font-size: 16px;
+    }
+}

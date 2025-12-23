@@ -3,7 +3,10 @@ import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { setUser } from '../features/auth/authSlice';
-import type { AppUser } from '../types/index'; // Добавили импорт типа
+import type { AppUser } from '../types/index';
+
+// 1. Импорт стилей
+import s from '../features/auth/Auth.module.css';
 
 const AuthPage: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -37,7 +40,6 @@ const AuthPage: React.FC = () => {
         }
 
         if (data) {
-          // Заменяем any на AppUser
           const newUser: AppUser = { 
             ...data, 
             isAdmin: Boolean(data.is_admin) 
@@ -60,7 +62,6 @@ const AuthPage: React.FC = () => {
           return;
         }
 
-        // Заменяем any на AppUser
         const userToStore: AppUser = { 
           ...data, 
           isAdmin: data.is_admin === true || String(data.is_admin) === 'true' 
@@ -70,7 +71,6 @@ const AuthPage: React.FC = () => {
         navigate('/');
       }
     } catch (err: unknown) {
-      // Вместо any используем unknown и проверку на тип Error
       if (err instanceof Error) {
         setError(err.message);
       } else {
@@ -80,17 +80,17 @@ const AuthPage: React.FC = () => {
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={cardStyle}>
-        <h2 style={titleStyle}>{isRegister ? 'Регистрация 🎀' : 'Вход ✨'}</h2>
+    <div className={s.container}>
+      <div className={s.card}>
+        <h2 className={s.title}>{isRegister ? 'Регистрация 🎀' : 'Вход ✨'}</h2>
         
-        {error && <div style={errorBoxStyle}>{error}</div>}
+        {error && <div className={s.errorBox}>{error}</div>}
         
-        <form onSubmit={handleAuth} style={formStyle}>
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>Ваш ник</label>
+        <form onSubmit={handleAuth} className={s.form}>
+          <div className={s.inputGroup}>
+            <label className={s.label}>Ваш ник</label>
             <input 
-              style={inputStyle}
+              className={s.input}
               placeholder="sasha_beauty" 
               value={username} 
               onChange={e => setUsername(e.target.value)} 
@@ -98,11 +98,11 @@ const AuthPage: React.FC = () => {
             />
           </div>
 
-          <div style={inputGroupStyle}>
-            <label style={labelStyle}>Пароль</label>
+          <div className={s.inputGroup}>
+            <label className={s.label}>Пароль</label>
             <input 
               type="password"
-              style={inputStyle}
+              className={s.input}
               placeholder="••••••••" 
               value={password} 
               onChange={e => setPassword(e.target.value)} 
@@ -110,29 +110,17 @@ const AuthPage: React.FC = () => {
             />
           </div>
 
-          <button type="submit" style={btnStyle}>
+          <button type="submit" className={s.btn}>
             {isRegister ? 'Создать аккаунт' : 'Войти'}
           </button>
         </form>
 
-        <p onClick={() => { setIsRegister(!isRegister); setError(''); }} style={toggleStyle}>
+        <p onClick={() => { setIsRegister(!isRegister); setError(''); }} className={s.toggle}>
           {isRegister ? 'Уже есть аккаунт? Войти' : 'Впервые тут? Создать профиль'}
         </p>
       </div>
     </div>
   );
 };
-
-// Стили
-const containerStyle: React.CSSProperties = { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh', padding: '20px' };
-const cardStyle: React.CSSProperties = { background: '#fff', padding: '40px', borderRadius: '30px', boxShadow: '0 15px 35px rgba(219, 112, 147, 0.1)', width: '100%', maxWidth: '400px' };
-const titleStyle: React.CSSProperties = { textAlign: 'center', color: '#db7093', marginBottom: '30px' };
-const formStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '20px' };
-const inputGroupStyle: React.CSSProperties = { display: 'flex', flexDirection: 'column', gap: '8px' };
-const labelStyle: React.CSSProperties = { fontSize: '14px', color: '#888' };
-const inputStyle: React.CSSProperties = { padding: '14px', borderRadius: '15px', border: '1px solid #f0f0f0', outline: 'none', backgroundColor: '#fafafa' };
-const btnStyle: React.CSSProperties = { background: 'linear-gradient(135deg, #db7093 0%, #ffb6c1 100%)', color: '#fff', border: 'none', padding: '16px', borderRadius: '15px', cursor: 'pointer', fontWeight: 'bold' };
-const toggleStyle: React.CSSProperties = { textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#db7093', cursor: 'pointer', textDecoration: 'underline' };
-const errorBoxStyle: React.CSSProperties = { color: '#ff4d4f', fontSize: '14px', textAlign: 'center', marginBottom: '20px', background: '#fff1f0', padding: '12px', borderRadius: '12px', border: '1px solid #ffa39e' };
 
 export default AuthPage;

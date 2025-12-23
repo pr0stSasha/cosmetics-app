@@ -1,0 +1,175 @@
+/* src/pages/AdminPage.module.css */
+
+.adminContainer {
+    padding: 40px 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    color: #db7093;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.formCard {
+    background: #fff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.gridInputs {
+    display: grid;
+    /* На десктопе 3 колонки, на планшете 2, на мобилке 1 */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.inputWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.label {
+    font-size: 13px;
+    color: #666;
+    font-weight: bold;
+}
+
+.input {
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #eee;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.input:focus {
+    border-color: #db7093;
+}
+
+.skinTypeSection {
+    margin-top: 25px;
+    border-top: 1px solid #f5f5f5;
+    padding-top: 20px;
+}
+
+.checkboxGroup {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.checkboxLabel {
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.buttonGroup {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.addBtn, .updateBtn, .cancelBtn {
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+}
+
+.addBtn { background: #db7093; color: #fff; }
+.updateBtn { background: #4CAF50; color: #fff; }
+.cancelBtn { background: #ccc; color: #fff; }
+
+/* ТАБЛИЦА */
+.tableWrapper {
+    margin-top: 50px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+}
+
+.th {
+    padding: 15px;
+    color: #db7093;
+    text-align: left;
+    background: #fdf2f5;
+}
+
+.tr {
+    border-bottom: 1px solid #f9f9f9;
+}
+
+.td {
+    padding: 15px;
+    font-size: 14px;
+}
+
+.imgThumb {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+}
+
+.editBtn { background: none; border: none; color: #3498db; cursor: pointer; margin-right: 15px; font-weight: bold; }
+.deleteBtn { background: none; border: none; color: #e74c3c; cursor: pointer; font-weight: bold; }
+
+.loading { text-align: center; padding: 100px; color: #db7093; font-size: 18px; }
+
+/* --- АДАПТИВНОСТЬ ТАБЛИЦЫ --- */
+@media (max-width: 768px) {
+    /* Скрываем заголовки таблицы */
+    .table thead {
+        display: none;
+    }
+
+    .tr {
+        display: block;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        padding: 10px;
+    }
+
+    .td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: none;
+        padding: 8px 10px;
+        text-align: right;
+    }
+
+    /* Добавляем подписи к данным через псевдоэлементы */
+    .td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #888;
+        text-align: left;
+    }
+
+    .imgThumb {
+        width: 60px;
+        height: 60px;
+    }
+
+    .buttonGroup {
+        flex-direction: column;
+    }
+}

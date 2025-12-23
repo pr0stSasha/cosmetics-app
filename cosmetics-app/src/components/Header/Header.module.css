@@ -1,3 +1,5 @@
+/* src/components/Header/Header.module.css */
+
 .header {
   background: #ffffff;
   padding: 1rem 2rem;
@@ -6,6 +8,19 @@
   align-items: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   font-family: sans-serif;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo a {
+  text-decoration: none;
+  color: #db7093;
 }
 
 .nav {
@@ -16,23 +31,36 @@
 
 .nav a {
   text-decoration: none;
-  color: #333;
+  color: #555;
   font-weight: 500;
+  font-size: 16px;
+  transition: color 0.2s;
 }
 
 .nav a:hover {
-  color: #e8a0bf; /* Розовый акцент */
+  color: #e8a0bf;
 }
 
 .adminLink {
-  color: #d4a373 !important; /* Золотистый для админки */
+  color: #db7093 !important;
   font-weight: bold;
 }
 
-.logoutBtn {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  background: white;
-  cursor: pointer;
+/* --- Адаптивность --- */
+@media (max-width: 768px) {
+  .header {
+    padding: 1rem;
+    flex-direction: column; /* Логотип сверху, меню снизу */
+    gap: 10px;
+  }
+
+  .nav {
+    gap: 15px;
+    flex-wrap: wrap; /* Чтобы ссылки переносились, если их много */
+    justify-content: center;
+  }
+
+  .logo {
+    font-size: 20px;
+  }
 }

@@ -1,0 +1,148 @@
+/* src/pages/RecommendationsPage.module.css */
+
+.pageContainer {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    color: #db7093;
+    margin-bottom: 30px;
+}
+
+.grid {
+    display: grid;
+    /* Умная сетка: на десктопе карточки по 220px, на мобилках растянутся */
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 25px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.favBtn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 10;
+}
+
+.imageWrapper {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.info {
+    padding: 15px;
+}
+
+.brandUrl {
+    color: #db7093;
+    font-size: 11px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.name {
+    font-size: 15px;
+    margin: 5px 0;
+    color: #333;
+}
+
+.price {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* --- Адаптивность --- */
+
+@media (max-width: 768px) {
+    .pageContainer {
+        padding: 20px 15px;
+    }
+    
+    .grid {
+        /* На планшетах карточки чуть меньше, чтобы влезало по 2-3 в ряд */
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+    }
+
+    .imageWrapper {
+        height: 140px; /* Уменьшаем высоту картинки на мобилках */
+    }
+
+    .title {
+        text-align: center;
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .grid {
+        /* На узких телефонах 2 карточки в ряд */
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+    }
+    
+    .info {
+        padding: 10px;
+    }
+    
+    .name {
+        font-size: 13px;
+    }
+}
+
+/* Служебные стили */
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+}
+
+.emptyContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 70vh;
+    text-align: center;
+}
+
+.linkButton {
+    padding: 10px 20px;
+    background: #db7093;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 20px;
+    margin-top: 15px;
+}
