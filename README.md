@@ -2,8 +2,8 @@
 
 **MaiMei** — это интеллектуальный каталог косметических продуктов, который помогает пользователям ориентироваться в мире бьюти-индустрии. В отличие от обычных магазинов, приложение не продает товары, а формирует персональную ленту рекомендаций на основе профиля и предпочтений пользователя, выявленных в ходе опроса.
 
-* **Демо-версия:** [https://pr0stSasha.github.io/cosmetics-app/](https://pr0stSasha.github.io/cosmetics-app/)
-* **Репозиторий:** [https://github.com/pr0stSasha/Frontend_second_sem](https://github.com/pr0stSasha/Frontend_second_sem)
+* **Ссылка на сайт** [https://pr0stSasha.github.io/cosmetics-app/](https://pr0stSasha.github.io/cosmetics-app/)
+* **Проект** [https://pr0stsasha.github.io/Frontend_second_sem/](https://pr0stsasha.github.io/Frontend_second_sem/)
 
 ---
 
