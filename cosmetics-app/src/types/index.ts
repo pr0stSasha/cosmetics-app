@@ -21,5 +21,4 @@ export interface Product {
   skin_type: string[];
   budget_segment: 'budget' | 'medium' | 'luxury';
   image_url: string;
-  description?: string;
 }

@@ -1,5 +1,4 @@
 import { createSlice } from '@reduxjs/toolkit';
-// Используем 'import type' для типов, чтобы TypeScript не ругался
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { AppUser } from '../../types';
 

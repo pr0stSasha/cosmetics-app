@@ -3,8 +3,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { supabase } from '../supabaseClient';
 import { logout } from '../features/auth/authSlice';
 import type { RootState } from '../app/store';
-
-// Импорт стилей
 import s from '../features/profile/Profile.module.css';
 
 const ProfilePage: React.FC = () => {

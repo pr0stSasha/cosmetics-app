@@ -13,7 +13,6 @@
 
 .grid {
     display: grid;
-    /* Умная сетка: на десктопе от 220px */
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 25px;
 }
@@ -92,7 +91,6 @@
     color: #333;
 }
 
-/* Состояния загрузки и пустоты */
 .center {
     display: flex;
     justify-content: center;
@@ -122,11 +120,8 @@
     margin-top: 15px;
 }
 
-/* --- Адаптивность --- */
-
 @media (max-width: 768px) {
     .grid {
-        /* На планшетах делаем карточки чуть компактнее */
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 15px;
     }
@@ -143,7 +138,6 @@
         padding: 20px 10px;
     }
     .grid {
-        /* На телефонах строго 2 карточки в ряд */
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }

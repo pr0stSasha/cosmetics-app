@@ -1,9 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { supabase } from '../../supabaseClient';
-import type { Product } from '../../types'; // Исправлен импорт (type-only)
+import type { Product } from '../../types';
 
 interface ProductState {
-  items: Product[]; // Добавили items для AdminPage
+  items: Product[];
   recommendations: Product[];
   favorites: Product[];
   loading: boolean;
@@ -18,16 +18,12 @@ const initialState: ProductState = {
   error: null,
 };
 
-// --- АСИНХРОННЫЕ ЭКШЕНЫ (Requirement 2.1 & 2.2) ---
-
-// GET: Все товары для админки
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async (_, { rejectWithValue }) => {
   const { data, error } = await supabase.from('products').select('*');
   if (error) return rejectWithValue(error.message);
   return data as Product[];
 });
 
-// GET: Рекомендации
 export const fetchRecommendations = createAsyncThunk(
   'products/fetchRecommendations',
   async ({ skinType, budget }: { skinType: string; budget: string }, { rejectWithValue }) => {
@@ -41,21 +37,18 @@ export const fetchRecommendations = createAsyncThunk(
   }
 );
 
-// POST: Добавить товар (Admin)
 export const addProduct = createAsyncThunk('products/addProduct', async (newProduct: Omit<Product, 'id'>, { rejectWithValue }) => {
   const { data, error } = await supabase.from('products').insert([newProduct]).select().single();
   if (error) return rejectWithValue(error.message);
   return data as Product;
 });
 
-// DELETE: Удалить товар (Admin)
 export const deleteProduct = createAsyncThunk('products/deleteProduct', async (id: string, { rejectWithValue }) => {
   const { error } = await supabase.from('products').delete().eq('id', id);
   if (error) return rejectWithValue(error.message);
   return id;
 });
 
-// PUT: Обновить товар (Admin)
 export const updateProduct = createAsyncThunk('products/updateProduct', async (product: Product, { rejectWithValue }) => {
   const { data, error } = await supabase.from('products').update(product).eq('id', product.id).select().single();
   if (error) return rejectWithValue(error.message);
@@ -68,30 +61,24 @@ const productSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch all
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.items = action.payload;
         state.loading = false;
       })
-      // Recommendations
       .addCase(fetchRecommendations.fulfilled, (state, action) => {
         state.recommendations = action.payload;
         state.loading = false;
       })
-      // Add
       .addCase(addProduct.fulfilled, (state, action) => {
         state.items.push(action.payload);
       })
-      // Delete
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.items = state.items.filter(p => p.id !== action.payload);
       })
-      // Update
       .addCase(updateProduct.fulfilled, (state, action) => {
         const index = state.items.findIndex(p => p.id === action.payload.id);
         if (index !== -1) state.items[index] = action.payload;
       })
-      // Loading states
       .addMatcher((action) => action.type.endsWith('/pending'), (state) => {
         state.loading = true;
       })

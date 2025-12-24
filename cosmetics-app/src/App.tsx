@@ -4,8 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { supabase } from './supabaseClient';
 import { setUser } from './features/auth/authSlice'; 
 import type { RootState, AppDispatch } from './app/store';
-
-// Проверь путь и регистр букв в названии файла!
 import Navbar from './components/Header/Header'; 
 import AuthPage from './pages/AuthPage';
 import RecommendationsPage from './pages/RecommendationsPage';
@@ -69,7 +67,6 @@ const App: React.FC = () => {
             <Route path="/" element={<RecommendationsPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            {/* Админка доступна только если isAdmin === true */}
             <Route path="/admin" element={user.isAdmin ? <AdminPage /> : <Navigate to="/" />} />
             <Route path="/auth" element={<Navigate to="/" replace />} />
             <Route path="*" element={<Navigate to="/" replace />} />

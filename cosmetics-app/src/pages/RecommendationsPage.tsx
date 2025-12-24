@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 import { supabase } from '../supabaseClient';
 import type { RootState } from '../app/store';
 import type { Product } from '../types';
-
-// Импортируем стили
 import s from '../features/products/Products.module.css';
 
 const RecommendationsPage: React.FC = () => {
@@ -14,7 +12,6 @@ const RecommendationsPage: React.FC = () => {
   const [favoriteIds, setFavoriteIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // ... (весь твой useEffect и toggleFavorite остаются без изменений) ...
   useEffect(() => {
     const loadAllData = async () => {
       if (!user) return;

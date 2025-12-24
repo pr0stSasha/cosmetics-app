@@ -38,7 +38,7 @@
   margin-bottom: 20px;
   border-radius: 10px;
   border: 1px solid #eee;
-  font-size: 16px; /* Предотвращает зум на iPhone */
+  font-size: 16px;
   background-color: #fff;
 }
 
@@ -81,7 +81,6 @@
   background: #fff5f5;
 }
 
-/* --- Адаптивность --- */
 @media (max-width: 480px) {
   .profilePage {
     padding: 20px 15px;

@@ -2,15 +2,12 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../../app/store';
-
-// 1. Импортируем стили из твоего модуля
 import s from './Header.module.css'; 
 
 const Header: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   return (
-    // 2. Используем классы из файла стилей
     <nav className={s.header}>
       <div className={s.logo}>
         <Link to="/">MAIMEI ✨</Link>

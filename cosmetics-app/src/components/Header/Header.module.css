@@ -1,5 +1,3 @@
-/* src/components/Header/Header.module.css */
-
 .header {
   background: #ffffff;
   padding: 1rem 2rem;
@@ -46,17 +44,16 @@
   font-weight: bold;
 }
 
-/* --- Адаптивность --- */
 @media (max-width: 768px) {
   .header {
     padding: 1rem;
-    flex-direction: column; /* Логотип сверху, меню снизу */
+    flex-direction: column;
     gap: 10px;
   }
 
   .nav {
     gap: 15px;
-    flex-wrap: wrap; /* Чтобы ссылки переносились, если их много */
+    flex-wrap: wrap;
     justify-content: center;
   }
 

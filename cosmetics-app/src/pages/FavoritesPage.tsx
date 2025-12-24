@@ -4,8 +4,6 @@ import { useSelector } from 'react-redux';
 import { supabase } from '../supabaseClient';
 import type { RootState } from '../app/store';
 import type { Product } from '../types';
-
-// Импорт стилей
 import s from '../features/favorites/FavoritesPage.module.css';
 
 interface FavoriteResponse {

@@ -1,20 +1,18 @@
-/* src/App.css */
 :root {
-  --main-pink: #fce4ec; /* Мягкий фон */
-  --accent-pink: #e8a0bf; /* Кнопки */
-  --text-main: #37474f; /* Глубокий серый вместо черного */
+  --main-pink: #fce4ec;
+  --accent-pink: #e8a0bf;
+  --text-main: #37474f;
   --bg-white: #ffffff;
 }
 
 body {
   margin: 0;
-  font-family: 'Inter', -apple-system, sans-serif; /* Чистый современный шрифт */
+  font-family: 'Inter', -apple-system, sans-serif;
   background-color: #fcfcfc;
   color: var(--text-main);
   -webkit-font-smoothing: antialiased;
 }
 
-/* Ограничиваем ширину контента, чтобы текст не растягивался на весь экран */
 .main-container {
   max-width: 1140px;
   margin: 0 auto;
@@ -22,13 +20,13 @@ body {
 }
 
 * {
-  box-sizing: border-box; /* Чтобы padding не раздувал ширину блоков */
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Запрещает горизонтальную прокрутку */
+  overflow-x: hidden;
   width: 100%;
 }
 

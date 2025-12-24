@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import { setUser } from '../features/auth/authSlice';
 import type { AppUser } from '../types/index';
-
-// 1. Импорт стилей
 import s from '../features/auth/Auth.module.css';
 
 const AuthPage: React.FC = () => {

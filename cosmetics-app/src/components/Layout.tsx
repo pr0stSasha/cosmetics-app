@@ -1,5 +1,5 @@
 import React from 'react';
-import Header from './Header/Header'; // Проверь правильность пути к Хедеру
+import Header from './Header/Header';
 import s from './Layout.module.css';
 
 interface LayoutProps {

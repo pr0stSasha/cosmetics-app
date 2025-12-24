@@ -13,7 +13,6 @@
 
 .grid {
     display: grid;
-    /* Умная сетка: на десктопе карточки по 220px, на мобилках растянутся */
     grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 25px;
 }
@@ -82,21 +81,18 @@
     font-weight: bold;
 }
 
-/* --- Адаптивность --- */
-
 @media (max-width: 768px) {
     .pageContainer {
         padding: 20px 15px;
     }
     
     .grid {
-        /* На планшетах карточки чуть меньше, чтобы влезало по 2-3 в ряд */
         grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
         gap: 15px;
     }
 
     .imageWrapper {
-        height: 140px; /* Уменьшаем высоту картинки на мобилках */
+        height: 140px;
     }
 
     .title {
@@ -107,7 +103,6 @@
 
 @media (max-width: 480px) {
     .grid {
-        /* На узких телефонах 2 карточки в ряд */
         grid-template-columns: repeat(2, 1fr);
         gap: 10px;
     }
@@ -121,7 +116,6 @@
     }
 }
 
-/* Служебные стили */
 .center {
     display: flex;
     justify-content: center;
