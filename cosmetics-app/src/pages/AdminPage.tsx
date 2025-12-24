@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  fetchProducts, 
-  addProduct, 
+import {
+  fetchProducts,
+  addProduct,
   deleteProduct,
-  updateProduct 
+  updateProduct
 } from '../features/products/productsSlice';
 
 import type { RootState, AppDispatch } from '../app/store';
@@ -46,60 +46,60 @@ const AdminPage: React.FC = () => {
   }, [dispatch]);
 
   const handleAiFill = async () => {
-  const query = form.name || form.product_url;
-  if (!query) return alert("Введите название товара! ✨");
-  
-  setIsAiLoading(true);
-  try {
-    const openai = new OpenAI({
-      apiKey: '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'.trim(), 
-      dangerouslyAllowBrowser: true,
-      baseURL: "https://api.groq.com/openai/v1"
-    });
+    const query = form.name || form.product_url;
+    if (!query) return alert("Введите название товара! ✨");
 
-    const completion = await openai.chat.completions.create({
-      messages: [
-        {
-        role: "system", 
-          content: `Ты эксперт косметики. Твоя задача — вернуть JSON.
+    setIsAiLoading(true);
+    try {
+      const openai = new OpenAI({
+        apiKey: import.meta.env.VITE_GROQ_API_KEY,
+        dangerouslyAllowBrowser: true,
+        baseURL: "https://api.groq.com/openai/v1"
+      });
+
+      const completion = await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `Ты эксперт косметики. Твоя задача — вернуть JSON.
           ПРАВИЛА:
           1. price: СТРОГО В РУБЛЯХ. Если видишь цену  не в них, переведи в рубли.
           2. category_type: Если в запросе есть слова (тушь, помада, блеск, тени, пудра, румяна, тональный, mascara, lipstick, eyeshadow) — СТРОГО "makeup". Иначе "care"
           4. budget_segment: "budget", "medium" или "luxury". Определяй их исходя из цены и бренда.
-          5. skin_type: массив из типов кожи: "dry", "oily", "combination", "normal", "sensitive". В случае типа "makeup" — возвращай все типы кожи.` 
-        },
-        { role: "user", content: `Товар: ${query}` }
-      ],
-      model: "llama-3.1-8b-instant",
-      response_format: { type: "json_object" }
-    });
+          5. skin_type: массив из типов кожи: "dry", "oily", "combination", "normal", "sensitive". В случае типа "makeup" — возвращай все типы кожи.`
+          },
+          { role: "user", content: `Товар: ${query}` }
+        ],
+        model: "llama-3.1-8b-instant",
+        response_format: { type: "json_object" }
+      });
 
-    const res = JSON.parse(completion.choices[0].message.content || "{}");
-    
-    setForm(prev => ({
-      ...prev,
-      name: res.name || query,
-      price: Number(res.price) || 1500,
-      product_url: `https://www.google.com/search?q=${encodeURIComponent(res.name || query)}`,
-      category_type: (res.category_type as 'care' | 'makeup') || "care",
-      budget_segment: (res.budget_segment as 'budget' | 'medium' | 'luxury') || "medium",
-      skin_type: res.skin_type || ['normal'],
-      image_url: prev.image_url || `https://loremflickr.com/640/480/cosmetics,${encodeURIComponent(res.name || 'beauty')}`
-    }));
+      const res = JSON.parse(completion.choices[0].message.content || "{}");
 
-  } catch (error) {
-    console.error("AI Error:", error);
-  } finally {
-    setIsAiLoading(false);
-  }
-};
+      setForm(prev => ({
+        ...prev,
+        name: res.name || query,
+        price: Number(res.price) || 1500,
+        product_url: `https://www.google.com/search?q=${encodeURIComponent(res.name || query)}`,
+        category_type: (res.category_type as 'care' | 'makeup') || "care",
+        budget_segment: (res.budget_segment as 'budget' | 'medium' | 'luxury') || "medium",
+        skin_type: res.skin_type || ['normal'],
+        image_url: prev.image_url || `https://loremflickr.com/640/480/cosmetics,${encodeURIComponent(res.name || 'beauty')}`
+      }));
+
+    } catch (error) {
+      console.error("AI Error:", error);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   const handleSkinTypeChange = (typeId: string) => {
     const currentTypes = form.skin_type || [];
     setForm({
       ...form,
-      skin_type: currentTypes.includes(typeId) 
-        ? currentTypes.filter(t => t !== typeId) 
+      skin_type: currentTypes.includes(typeId)
+        ? currentTypes.filter(t => t !== typeId)
         : [...currentTypes, typeId]
     });
   };
@@ -134,15 +134,15 @@ const AdminPage: React.FC = () => {
 
       <div className={s.formCard}>
         <h3>{isEditing ? `Редактировать: ${form.name}` : 'Добавить новинку'}</h3>
-        
+
         <div className={s.gridInputs}>
           <div className={s.inputWrapper} style={{ gridColumn: '1 / -1' }}>
             <label className={s.label}>Название (для ИИ)</label>
             <div style={{ display: 'flex', gap: '10px' }}>
-              <input 
-                value={form.name || form.product_url} 
-                onChange={e => setForm({...form, name: e.target.value})} 
-                className={s.input} 
+              <input
+                value={form.name || form.product_url}
+                onChange={e => setForm({ ...form, name: e.target.value })}
+                className={s.input}
                 placeholder="Напр: Сыворотка The Ordinary"
               />
               <button onClick={handleAiFill} disabled={isAiLoading} className={s.aiBtn}>
@@ -153,12 +153,12 @@ const AdminPage: React.FC = () => {
 
           <div className={s.inputWrapper}>
             <label className={s.label}>Цена (₽)</label>
-            <input type="number" value={form.price || ''} onChange={e => setForm({...form, price: Number(e.target.value)})} className={s.input} />
+            <input type="number" value={form.price || ''} onChange={e => setForm({ ...form, price: Number(e.target.value) })} className={s.input} />
           </div>
 
           <div className={s.inputWrapper}>
             <label className={s.label}>Категория</label>
-            <select value={form.category_type} onChange={e => setForm({...form, category_type: e.target.value as 'care' | 'makeup'})} className={s.input}>
+            <select value={form.category_type} onChange={e => setForm({ ...form, category_type: e.target.value as 'care' | 'makeup' })} className={s.input}>
               <option value="care">Уход</option>
               <option value="makeup">Макияж</option>
             </select>
@@ -166,7 +166,7 @@ const AdminPage: React.FC = () => {
 
           <div className={s.inputWrapper}>
             <label className={s.label}>Сегмент бюджета</label>
-            <select value={form.budget_segment} onChange={e => setForm({...form, budget_segment: e.target.value as 'budget' | 'medium' | 'luxury'})} className={s.input}>
+            <select value={form.budget_segment} onChange={e => setForm({ ...form, budget_segment: e.target.value as 'budget' | 'medium' | 'luxury' })} className={s.input}>
               <option value="budget">Бюджетный</option>
               <option value="medium">Миддл-маркет</option>
               <option value="luxury">Люкс</option>
@@ -175,7 +175,7 @@ const AdminPage: React.FC = () => {
 
           <div className={s.inputWrapper} style={{ gridColumn: '1 / -1' }}>
             <label className={s.label}>URL фото</label>
-            <input value={form.image_url} onChange={e => setForm({...form, image_url: e.target.value})} className={s.input} />
+            <input value={form.image_url} onChange={e => setForm({ ...form, image_url: e.target.value })} className={s.input} />
           </div>
         </div>
 
@@ -184,9 +184,9 @@ const AdminPage: React.FC = () => {
           <div className={s.checkboxGroup}>
             {skinTypes.map(type => (
               <label key={type.id} className={s.checkboxLabel}>
-                <input 
-                  type="checkbox" 
-                  checked={form.skin_type?.includes(type.id)} 
+                <input
+                  type="checkbox"
+                  checked={form.skin_type?.includes(type.id)}
                   onChange={() => handleSkinTypeChange(type.id)}
                 /> {type.label}
               </label>
