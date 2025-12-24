@@ -1,73 +1,73 @@
-# React + TypeScript + Vite
+MaiMei - персональный подбор косметики 💄
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+📌 Описание приложения *aiMei — это веб-приложение для подбора косметики на основе индивидуальных предпочтений пользователя. Пользователь проходит опрос, после чего    получает персональные рекомендации товаров, может добавлять их в избранное, удалять оттуда, а также редактировать свои пожелания. Приложение также поддерживает роли   пользователей (пользователь / администратор). 
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
-
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+🔗 Репозиторий проекта:(https://github.com/pr0stSasha/Frontend_second_sem) 
+📥 Как получить исходники 
+      bash git clone https://github.com/pr0stSasha/cosmetics-app.git 
+      cd cosmetics-app 
+⚙️ Требования 
+  Основные технологии Node.js:
+    версия 18+ (рекомендуется Node.js 22 LTS) 👉 https://nodejs.org/ 
+    npm (устанавливается вместе с Node.js) 
+    React + TypeScript
+    Redux Toolkit
+    React Router
+    Дополнительные библиотеки
+      @reduxjs/toolkit
+      react-redux
+      react-router-dom
+      axios
+      eslint
+      prettier
+  Бэкенд / API
+    На текущем этапе используется mock API / локальное хранилище. 
+    Проект спроектирован так, чтобы можно было подключить:
+      Firebase / Supabase либо Node.js backend (REST API) 
+🚀 Как запустить проект локально (Unix / macOS / Linux) 
+  1. Установка зависимостей bash Копировать код npm install
+  2.  Переменные окружения Создай файл .env в корне проекта: env Копировать код VITE_API_URL=http://localhost:3000 В дальнейшем здесь может быть URL бэкенда или          Firebase / Supabase API.
+  3.  Запуск приложения bash Копировать код npm run dev 4. Открытие приложения После запуска приложение будет доступно по адресу:                                         http://localhost:3000/cosmetics-app/
+🧠 Основной бизнес-кейс приложения
+    Пользователь заходит на главную страницу
+    Регистрируется или входит в аккаунт
+    Переходит в профиль
+    Проходит опрос (чек-лист с предпочтениями)
+    Переходит на страницу рекомендаций
+    Получает список косметических товаров, подобранных на основе опроса
+    Может: добавить товар в избранное добавить товар или удалить его оттуда
+    Администратор дополнительно может: перейти на страницу управления товарами добавлять и удалять товары
+🗂 Структура проекта
+src/
+├── app/
+│   ├── store.ts        # Redux store
+│   ├── hooks.ts        # Typed hooks (useAppDispatch, useAppSelector)
+│
+├── features/
+│   ├── auth/           # Авторизация, роли пользователей
+│   │   └── authSlice.ts
+│   ├── products/       # Товары, избранное, чёрный список
+│   │   └── productsSlice.ts
+│   ├── survey/         # Опрос пользователя
+│   │   └── surveySlice.ts
+│
+├── pages/
+│   ├── LoginPage.tsx
+│   ├── ProfilePage.tsx
+│   ├── FavoritesPage.tsx
+│   ├── RecommendationsPage.tsx
+│   └── AdminPage.tsx
+│
+├── components/
+│   ├── Navbar.tsx      # Навигация
+│   ├── ProductCard.tsx
+│   └── SurveyForm.tsx
+│
+├── routes/
+│   └── AppRouter.tsx   # React Router
+│
+├── styles/
+│   └── *.module.css    # CSS Modules
+│
+├── main.tsx
+├── App.tsx
